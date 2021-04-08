@@ -30,7 +30,7 @@
   /* main */
   var CSSSelector = class {
     constructor(selector) {
-      this.order = new OPT.REG['SEPARATE'](selector).split().map(s => {
+      this.order = new OPT.REG['SEPARATE'](selector.trim()).split().map(s => {
         var e = new OPT.REG['SYMBOL'](s).exec(), i = 0;
         var n = e.map(_ => {
           var r = s.substring(i, _.index).trim();
