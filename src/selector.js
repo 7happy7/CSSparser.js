@@ -40,14 +40,14 @@
         }).flat();
         n.push(s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
-        var x = [], y, z = {tag: '', id: null, class: null, attribute: [], next: {}}, _;
+        var w, x = [], y, z = {tag: '', id: null, class: null, attribute: [], next: {}}, _;
         while((y = n.shift()) || y == '') {
           (y == '' || y == '>' || y == '~' || y == '+')
             ? (x.push(z), z = {tag: '', id: null, class: null, attribute: [], next: {type: SYM_CHAR.COM[y]}})
             : (_
               ? (z[_] = y, _ = void(0))
-              : (new OPT.REG['ATTRIBUTE'](y).exec().length
-                ? z.attribute.push(new OPT.REG['ATTRIBUTE'](y).exec()[0].slice(1, 4))
+              : ((w = new OPT.REG['ATTRIBUTE'](y).exec()).length
+                ? z.attribute.push(w[0].slice(1, 4))
                 : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
               ))
         }
