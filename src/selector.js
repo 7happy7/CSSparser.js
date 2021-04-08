@@ -2,6 +2,7 @@
   var OPT = {
     STR: {
       SYMBOL: '\\s*[>~\\+\\.#]\\s*|\\[[^\\]]+\\]|\\s+',// combinator, class, id, attribute
+      ATTRIBUTE: '^\\[(.+?)(?:(\\*|\\^|\\$)\\=(.*?)|)\\]$',
       SEPARATE: '\\s*,\\s*'
     },
     BASE: class {
@@ -39,14 +40,14 @@
         }).flat();
         n.push(s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
-        var x = [], y, z = {tag: '', id: null, class: null, atr: [], next: {}}, _;
+        var x = [], y, z = {tag: '', id: null, class: null, attribute: [], next: {}}, _;
         while((y = n.shift()) || y == '') {
           (y == '' || y == '>' || y == '~' || y == '+')
-            ? (x.push(z), z = {tag: '', id: null, class: null, atr: [], next: {type: SYM_CHAR.COM[y]}})
+            ? (x.push(z), z = {tag: '', id: null, class: null, attribute: [], next: {type: SYM_CHAR.COM[y]}})
             : (_
               ? (z[_] = y, _ = void(0))
-              : (y.match(/\[[^\]]+\]/)
-                ? z.atr.push(y)
+              : (new OPT.REG['ATTRIBUTE'](y).exec().length
+                ? z.attribute.push(new OPT.REG['ATTRIBUTE'](y).exec()[0].slice(1, 4))
                 : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
               ))
         }
