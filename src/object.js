@@ -23,8 +23,7 @@
     }
     get map() {
       var css = REV(this.css);
-      var bracket = new OPT.REG['BRACKET_REV']( css ).exec();
-      console.log(css, bracket);
+      var bracket = new OPT.REG['BRACKET_REV']( css ).exec(), _ = bracket.map(v => v[0]), _a = _.filter(v => v == '}'), _b = _.filter(v => v == '{');
       var map = [], a = 0, b = 0, c, d, e, i = 0;
       while((c = bracket.shift())) {
         i && map.push( {str: REV(css.substring(i + 1, c.index)).trim(), sel: d} );
@@ -32,7 +31,11 @@
         c == '}' ? (a++, d = false) : (b++, d = true);
       }
       i && map.push( {str: REV(css.substring(i + 1)).trim(), sel: d} );
-      return map.reverse();
+      var res = map.reverse();
+      if(!res[0].sel || res[res.length - 1].sel || _.length !== (_a.length + _b.length) || _a.length !== _b.length) {
+        throw new Error('Invalid Style');
+      }
+      return res;
     }
   }
 
