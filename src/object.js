@@ -65,11 +65,11 @@
       return res;
     }
     get entry() {
-      var com = new StyleComponent(null, '_parent'), cur, res = com, base = {}, offset = 0, flg = true;
+      var com = new StyleComponent(null, '_parent'), cur, res = com, base = {}, offset = -1, flg = true;
       base[offset++] = res;
       this.map.forEach(m => {
         m.sel
-          ? (cur = new StyleComponent(m.str, 'default'), flg ? (com.append(cur)) : res.append(cur), com = cur)
+          ? (cur = new StyleComponent(m.str, 'default'), flg ? com.append(cur) : (base[m.offset - 1].append(cur), base[m.offset] = cur), com = cur)
           : com.set(m.str);
         flg = m.sel;
       });
@@ -96,7 +96,7 @@ a[href*="\\{"] {
 }
 `;
 var c = new CSSObject(s);
-console.log(c.map);
+console.log(c.map, c.entry);
 */
 
 /*
@@ -109,4 +109,28 @@ console.log(c.map);
   5: {str: "100%",                 sel: true,   offset: 1}
   6: {str: "color: blue;",         sel: false,  offset: 2}
 ]
+
+StyleComponent {
+  child: [
+    0: StyleComponent {name: "a[href*="\{"]", type: "default", value: Array(1), child: Array(0), original: Array(4)}
+    1: StyleComponent
+      child: [
+        0: StyleComponent {name: "0%", type: "default", value: Array(1), child: Array(0), original: Array(6)}
+        1: StyleComponent
+          child: []
+          name: "100%"
+          original: (5) [StyleComponent, StyleComponent, StyleComponent, StyleComponent, StyleComponent]
+          type: "default"
+          value: ["color: blue;"]
+      ]
+      name: "@keyframes anim"
+      original: (5) [StyleComponent, StyleComponent, StyleComponent, StyleComponent, StyleComponent]
+      type: "default"
+      value: []
+  ]
+  name: null
+  original: (5) [StyleComponent, StyleComponent, StyleComponent, StyleComponent, StyleComponent]
+  type: "_parent"
+  value: []
+}
 */
