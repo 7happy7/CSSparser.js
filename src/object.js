@@ -48,7 +48,7 @@
     constructor(css) {
       this.css = css.trim();
     }
-    get map() {
+    get entry() {
       var css = REV(this.css);
       var bracket = new OPT.REG['BRACKET_REV']( css ).exec(), _ = bracket.map(v => v[0]), _a = _.filter(v => v == '}'), _b = _.filter(v => v == '{');
       var map = [], a = 0, b = 0, c, d, e, i = 0;
@@ -64,14 +64,14 @@
       }
       return res;
     }
-    get entry() {
+    get map() {
       var com = new StyleComponent(null, '_parent'), cur, res = com, base = {}, offset = -1, flg = true;
       base[offset++] = res;
-      this.map.forEach(m => {
-        m.sel
-          ? (cur = new StyleComponent(m.str, 'default'), flg ? com.append(cur) : (base[m.offset - 1].append(cur), base[m.offset] = cur), com = cur)
-          : com.set(m.str);
-        flg = m.sel;
+      this.entry.forEach(e => {
+        e.sel
+          ? (cur = new StyleComponent(e.str, 'default'), flg ? com.append(cur) : (base[e.offset - 1].append(cur), base[e.offset] = cur), com = cur)
+          : com.set(e.str);
+        flg = e.sel;
       });
       return res;
     }
@@ -96,10 +96,10 @@ a[href*="\\{"] {
 }
 `;
 var c = new CSSObject(s);
-console.log(c.map, c.entry);
+console.log(c.entry, c.map);
 */
 
-/*
+/* c.entry:
 [
   0: {str: "a[href*="\{"]",        sel: true,   offset: 0}
   1: {str: "animation: anim 1s;",  sel: false,  offset: 1}
@@ -109,7 +109,8 @@ console.log(c.map, c.entry);
   5: {str: "100%",                 sel: true,   offset: 1}
   6: {str: "color: blue;",         sel: false,  offset: 2}
 ]
-
+*/
+/* c.map:
 StyleComponent {
   child: [
     0: StyleComponent {name: "a[href*="\{"]", type: "default", value: Array(1), child: Array(0), original: Array(4)}
