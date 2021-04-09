@@ -23,6 +23,27 @@
   });
   var REV = s => s.split('').reverse().join('');
 
+  var StyleComponent = class {
+    constructor(name, type) {
+      this.name = name;
+      this.type = type;
+      this.value = [];
+      this.child = [];
+      this.original = [this];
+    }
+    set(value) {
+      this.value.push(value);
+      return this;
+    }
+    append(child) {
+      this.child.push(child);
+      this.original.push(child, ...child.original);
+      this.original = this.original.filter((v, i, a) => a.indexOf(v) == i);;
+      child.original = this.original;
+      return this;
+    }
+  }
+
   var CSSObject = class {
     constructor(css) {
       this.css = css.trim();
@@ -32,21 +53,33 @@
       var bracket = new OPT.REG['BRACKET_REV']( css ).exec(), _ = bracket.map(v => v[0]), _a = _.filter(v => v == '}'), _b = _.filter(v => v == '{');
       var map = [], a = 0, b = 0, c, d, e, i = 0;
       while((c = bracket.shift())) {
-        i && map.push( {str: REV(css.substring(i + 1, c.index)).trim(), sel: d} );
+        i && map.push( {str: REV(css.substring(i + 1, c.index)).trim(), sel: d, offset: a - b} );
         i = c.index;
         c == '}' ? (a++, d = false) : (b++, d = true);
       }
-      i && map.push( {str: REV(css.substring(i + 1)).trim(), sel: d} );
+      i && map.push( {str: REV(css.substring(i + 1)).trim(), sel: d, offset: a - b} );
       var res = map.reverse();
       if(!res[0].sel || res[res.length - 1].sel || _.length !== (_a.length + _b.length) || _a.length !== _b.length) {
         throw new CSSStyleError('The bracket pattern is not valid.');
       }
       return res;
     }
+    get entry() {
+      var com = new StyleComponent(null, '_parent'), cur, res = com, base = {}, offset = 0, flg = true;
+      base[offset++] = res;
+      this.map.forEach(m => {
+        m.sel
+          ? (cur = new StyleComponent(m.str, 'default'), flg ? (com.append(cur)) : res.append(cur), com = cur)
+          : com.set(m.str);
+        flg = m.sel;
+      });
+      return res;
+    }
   }
 
   Global.CSSObject = CSSObject;
 })(this);
+
 
 /*
 var s = `
@@ -68,12 +101,12 @@ console.log(c.map);
 
 /*
 [
-  0: {str: "a[href*="\{"]",       sel: true  }
-  1: {str: "animation: anim 1s;", sel: false }
-  2: {str: "@keyframes anim",     sel: true  }
-  3: {str: "0%",                  sel: true  }
-  4: {str: "color: red;",         sel: false }
-  5: {str: "100%",                sel: true  }
-  6: {str: "color: blue;",        sel: false }
+  0: {str: "a[href*="\{"]",        sel: true,   offset: 0}
+  1: {str: "animation: anim 1s;",  sel: false,  offset: 1}
+  2: {str: "@keyframes anim",      sel: true,   offset: 0}
+  3: {str: "0%",                   sel: true,   offset: 1}
+  4: {str: "color: red;",          sel: false,  offset: 2}
+  5: {str: "100%",                 sel: true,   offset: 1}
+  6: {str: "color: blue;",         sel: false,  offset: 2}
 ]
 */
