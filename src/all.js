@@ -68,8 +68,6 @@
       });
     }
   };
-  
-  
   var REV = s => s.split('').reverse().join('');
   var StyleComponent = class {
     constructor(key, type) {
@@ -78,6 +76,7 @@
       this.value = [];
       this.child = [];
       this.original = [this];
+      this.parent = null;
     }
     set(value) {
       this.value.push(value);
@@ -86,8 +85,9 @@
     append(child) {
       this.child.push(child);
       this.original.push(child, ...child.original);
-      this.original = this.original.filter((v, i, a) => a.indexOf(v) == i);;
+      this.original = this.original.filter((v, i, a) => a.indexOf(v) == i);
       child.original = this.original;
+      child.parent = this;
       return this;
     }
   }
@@ -113,13 +113,18 @@
       return res;
     }
     get map() {
-      var com = new StyleComponent(null, '_parent'), cur, base = {}, flg = true, reg;
+      var com = new StyleComponent(null, '__root__'), cur, base = {}, flg = true, reg;
       base[-1] = com;
       this.entry.forEach(e => {
         e.sel
           ? (
-            reg = (new OPT.REG['AT_RULES'](e.str).exec()[0] || new OPT.REG['KEYFRAMES'](e.str).exec()[0] || []).splice(1, 3),
-            cur = new StyleComponent(reg.length ? reg : new CSSSelector(e.str), ['default', 'keyframes_duration', 'at_rule'][reg.length]),
+            reg = (
+              new OPT.REG['AT_RULES'](e.str).exec()[0] || new OPT.REG['KEYFRAMES'](e.str).exec()[0] || []
+            ).splice(1, 3),
+            cur = new StyleComponent(
+              reg.length ? reg : new CSSSelector(e.str),
+              ['default', 'keyframes_duration', 'at_rule'][reg.length]
+            ),
             flg
               ? com.append(cur)
               : (base[e.offset - 1].append(cur), base[e.offset] = cur),
@@ -152,41 +157,4 @@ a[href*="\\{"] {
 `;
 var c = new CSSObject(s);
 console.log(c.entry, c.map);
-*/
-
-/* c.entry:
-[
-  0: {str: "a[href*="\{"]",        sel: true,   offset: 0}
-  1: {str: "animation: anim 1s;",  sel: false,  offset: 1}
-  2: {str: "@keyframes anim",      sel: true,   offset: 0}
-  3: {str: "0%",                   sel: true,   offset: 1}
-  4: {str: "color: red;",          sel: false,  offset: 2}
-  5: {str: "100%",                 sel: true,   offset: 1}
-  6: {str: "color: blue;",         sel: false,  offset: 2}
-]
-*/
-/* c.map:
-StyleComponent {
-  child: [
-    0: StyleComponent {name: "a[href*="\{"]", type: "default", value: Array(1), child: Array(0), original: Array(4)}
-    1: StyleComponent
-      child: [
-        0: StyleComponent {name: "0%", type: "default", value: Array(1), child: Array(0), original: Array(6)}
-        1: StyleComponent
-          child: []
-          name: "100%"
-          original: (5) [StyleComponent, StyleComponent, StyleComponent, StyleComponent, StyleComponent]
-          type: "default"
-          value: ["color: blue;"]
-      ]
-      name: "@keyframes anim"
-      original: (5) [StyleComponent, StyleComponent, StyleComponent, StyleComponent, StyleComponent]
-      type: "default"
-      value: []
-  ]
-  name: null
-  original: (5) [StyleComponent, StyleComponent, StyleComponent, StyleComponent, StyleComponent]
-  type: "_parent"
-  value: []
-}
 */
