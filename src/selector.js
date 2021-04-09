@@ -2,7 +2,7 @@
   var OPT = {
     STR: {
       SYMBOL: '\\s*[>~\\+\\.#]\\s*|\\[[^\\]]+\\]|\\s+',// combinator, class, id, attribute
-      ATTRIBUTE: '^\\[(.+?)(?:(\\*|\\^|\\$)\\=(.*?)|)\\]$',
+      ATTRIBUTE: '^\\[(.+?)(?:(\\*|\\^|\\$)?\\=(.*?)|)\\]$',
       SEPARATE: '\\s*,\\s*'
     },
     BASE: class {
@@ -85,7 +85,7 @@
       tag: "a",
       id: null,
       class: null,
-      atr: ['[href$="/main"]'],
+      atr: ["href", "$", "/main"],
       next: {type: "descendant"}
     }
     3: {
