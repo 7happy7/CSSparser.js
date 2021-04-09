@@ -1,4 +1,10 @@
 (Global => {
+  var CSSStyleError = class extends Error {
+    constructor(msg) {
+      super(msg);
+      this.name = 'CSSStyleError';
+    }
+  }
   var OPT = {
     STR: {
       BRACKET_REV: '[\\{\\}](?!\\\\)'
@@ -33,7 +39,7 @@
       i && map.push( {str: REV(css.substring(i + 1)).trim(), sel: d} );
       var res = map.reverse();
       if(!res[0].sel || res[res.length - 1].sel || _.length !== (_a.length + _b.length) || _a.length !== _b.length) {
-        throw new Error('Invalid Style');
+        throw new CSSStyleError('Invalid Style');
       }
       return res;
     }
