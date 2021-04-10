@@ -38,9 +38,17 @@
       CHAR_SYM[s][SYM_CHAR[s][k]] = k;
     })
   });
+
   var CSSSelector = class {
     constructor(selector) {
       this.selector = selector;
+    }
+  };
+
+  var CSSBasicSelector = class extends CSSSelector {
+    constructor(selector) {
+      super(selector);
+      this.type = 'basic';
     }
     get order() {
       return new OPT.REG['SEPARATE'](this.selector.trim()).split().map(s => {
@@ -68,6 +76,37 @@
       });
     }
   };
+  var CSSAtRuleSelector = class extends CSSSelector {
+    constructor(selector, rule, value = null) {
+      super(selector);
+      this.type = 'at_rule';
+      this.rule = rule;
+      this.value = value;
+    }
+  };
+  var CSSKeyFramesDurationSelector = class extends CSSSelector {
+    constructor(selector, ...duration) {
+      super(selector);
+      this.type = 'keyframes_duration';
+      this.duration = duration.map(v => new OPT.REG['KEYFRAMES'](v).exec()[0]);
+      if(this.duration.find(v => !v)) throw new CSSStyleError(`The keyframes duration "${this.duration}" is not valid.`);
+    }
+  };
+
+  var SelectorSwitcher = selector => {
+    var sels = new OPT.REG['SEPARATE'](selector.trim()).split();
+    var obj = {
+      AT_RULES: (s, r) => new CSSAtRuleSelector(s, ...r),
+      KEYFRAMES: (s, r) => new CSSKeyFramesDurationSelector(s, ...r)
+    }
+    var opt = ['AT_RULES', 'KEYFRAMES'], o, r;
+    while((o = opt.shift())) {
+      r = new OPT.REG[o](sels[0]).exec()[0];
+      if(r) break;
+    }
+    return r ? obj[o](selector, r.slice(1)) : new CSSBasicSelector(selector);
+  }
+
   var REV = s => s.split('').reverse().join('');
   var StyleComponent = class {
     constructor(key, type) {
@@ -94,10 +133,10 @@
 
   var CSSObject = class {
     constructor(css) {
-      this.css = css.trim();
+      this.css = css;
     }
     get entry() {
-      var css = REV(this.css);
+      var css = REV(this.css.trim());
       var bracket = new OPT.REG['BRACKET_REV']( css ).exec(), _ = bracket.map(v => v[0]), _a = _.filter(v => v == '}'), _b = _.filter(v => v == '{');
       var map = [], a = 0, b = 0, c, d, e, i = 0;
       while((c = bracket.shift())) {
@@ -118,13 +157,8 @@
       this.entry.forEach(e => {
         e.sel
           ? (
-            reg = (
-              new OPT.REG['AT_RULES'](e.str).exec()[0] || new OPT.REG['KEYFRAMES'](e.str).exec()[0] || []
-            ).splice(1, 3),
-            cur = new StyleComponent(
-              reg.length ? reg : new CSSSelector(e.str),
-              ['default', 'keyframes_duration', 'at_rule'][reg.length]
-            ),
+            reg = SelectorSwitcher(e.str),
+            cur = new StyleComponent(reg, reg.type),
             flg
               ? com.append(cur)
               : (base[e.offset - 1].append(cur), base[e.offset] = cur),
@@ -139,6 +173,7 @@
 
   Global.CSSObject = CSSObject;
 })(this);
+
 
 
 /*
