@@ -99,7 +99,7 @@
       AT_RULES: (s, r) => new CSSAtRuleSelector(s, ...r),
       KEYFRAMES: (s, r) => new CSSKeyFramesDurationSelector(s, ...r)
     }
-    var opt = ['AT_RULES', 'KEYFRAMES'], o, r;
+    var opt = Object.keys(obj), o, r;
     while((o = opt.shift())) {
       r = new OPT.REG[o](sels[0]).exec()[0];
       if(r) break;
