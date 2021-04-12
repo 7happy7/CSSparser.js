@@ -45,6 +45,23 @@
     })
   });
 
+  var CSSSelectorParts = class {
+    constructor() {
+      this.tag = null;
+      this.id = null;
+      this.class = [];
+      this.pseudo = {class: [], element: []};
+      this.attribute = [];
+      this.next = {type: null};
+    }
+    isGreaterThan(parts) {
+      if(!(parts instanceof CSSSelectorParts)) throw new CSSStyleError('Invalid argument.');
+      return (this.id && !parts.id)
+        || ([...this.class, ...this.attribute, ...this.pseudo.class].length > [...parts.class, ...parts.attribute, ...parts.pseudo.class].length)
+        || ([...(this.tag ? [this.tag] : []), ...this.pseudo.element].length > [...(this.tag ? [this.tag] : []), ...this.pseudo.element].length);
+    }
+  }
+
   var CSSSelector = class {
     constructor(selector) {
       this.selector = selector;
@@ -66,10 +83,10 @@
         }).flat();
         n.push(s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
-        var _o = () => {return {tag: null, id: null, class: null, pseudo: {class: [], element: []}, attribute: [], next: {type: 'descendant'}}}, w, x = [], y, z = _o(), _;
+        var w, x = [], y, z = new CSSSelectorParts, _;
         while((y = n.shift()) || y == '') {
           (y == '' || SYM_CHAR.COM[y])
-            ? (x.push(z), z = _o(), z.next.type = SYM_CHAR.COM[y])
+            ? (x.push(z), z = new CSSSelectorParts, z.next.type = SYM_CHAR.COM[y])
             : (_
               ? (z[_] = y, _ = void(0))
               : ((w = new OPT.REG['ATTRIBUTE'](y).exec()).length
@@ -80,7 +97,7 @@
               )))
         }
         x.push(z);
-        return x.reverse().filter(v => JSON.stringify(v) !== JSON.stringify(_o()));
+        return x.reverse().filter(v => JSON.stringify(v) !== JSON.stringify(new CSSSelectorParts));
       });
     }
   };
@@ -221,8 +238,6 @@ var s = `
 `;
 var obj = new CSSObject(s);
 var c = obj.CSSOM;
-
 var _ = c.child[1].key.order; // "#body > a[href*="\\{"]:first-child:last-child::before"
-
 console.log(obj.entry, c, _);
 */
