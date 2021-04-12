@@ -9,6 +9,7 @@
     STR: {
       SYMBOL: '\\s*[>~\\+\\.#]\\s*|\\[[^\\]]+\\]|\\s+',// combinator, class, id, attribute
       ATTRIBUTE: '^\\[(.+?)(?:(\\*|\\^|\\$)?\\=(.*?)|)\\]$',
+      PSEUDO: '(\\:{1,2})([^\\:\\s]+)',
       SEPARATE: '\\s*,\\s*',
       BRACKET_REV: '[\\{\\}](?!\\\\)',
       AT_RULES: '^@(\\S+?)(?:\\s(.*?)|)$',
@@ -33,6 +34,7 @@
   
   var SYM_CHAR = {
     ATR: {'#': 'id', '.': 'class'},
+    PSE: {':': 'class', '::': 'element'},
     COM: {'': 'descendant', '>': 'child', '~': 'general', '+': 'adjacent'}
   };
   var CHAR_SYM = {};// reversing SYM_CHAR
@@ -64,19 +66,21 @@
         }).flat();
         n.push(s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
-        var w, x = [], y, z = {tag: '', id: null, class: null, attribute: [], next: {}}, _;
+        var _o = () => {return {tag: null, id: null, class: null, pseudo: {class: [], element: []}, attribute: [], next: {type: 'descendant'}}}, w, x = [], y, z = _o(), _;
         while((y = n.shift()) || y == '') {
-          (y == '' || y == '>' || y == '~' || y == '+')
-            ? (x.push(z), z = {tag: '', id: null, class: null, attribute: [], next: {type: SYM_CHAR.COM[y]}})
+          (y == '' || SYM_CHAR.COM[y])
+            ? (x.push(z), z = _o(), z.next.type = SYM_CHAR.COM[y])
             : (_
               ? (z[_] = y, _ = void(0))
               : ((w = new OPT.REG['ATTRIBUTE'](y).exec()).length
                 ? z.attribute.push(w[0].slice(1, 4))
-                : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
-              ))
+                : ((w = new OPT.REG['PSEUDO'](y).exec()).length
+                  ? w.forEach(_w => z.pseudo[SYM_CHAR.PSE[_w[1]]].push(_w[2]))
+                  : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
+              )))
         }
         x.push(z);
-        return x.reverse();
+        return x.reverse().filter(v => JSON.stringify(v) !== JSON.stringify(_o()));
       });
     }
   };
@@ -198,11 +202,12 @@
 })(this);
 
 
-
 /*
+
 var s = `
 @charset "utf-8";
-a[href*="\\{"] {
+#body > a[href*="\\{"]:first-child:last-child::before {
+  content: "";
   animation: anim 1s;
 }
 @keyframes anim {
@@ -214,7 +219,10 @@ a[href*="\\{"] {
   }
 }
 `;
-var c = new CSSObject(s);
-console.log(c.entry, c.CSSOM);
+var obj = new CSSObject(s);
+var c = obj.CSSOM;
 
+var _ = c.child[1].key.order; // "#body > a[href*="\\{"]:first-child:last-child::before"
+
+console.log(obj.entry, c, _);
 */
