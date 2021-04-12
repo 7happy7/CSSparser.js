@@ -5,6 +5,25 @@
       this.name = 'CSSStyleError';
     }
   }
+
+  var NestParser = class {
+    constructor(start, end) {
+      this._start = start;
+      this._end = end;
+    }
+    get start() {return new RegExp(this._start, 'igm')}
+    get end() {return new RegExp(this._end, 'igm')}
+    parse(string) {
+      var n = 0, p = [], ps = [], r = [], i = 0;
+      var a = [...string.matchAll(this.start)].map((v, i) => (v.type = true, v)), b = [...string.matchAll(this.end)].map((v, i, a) => (v.type = false, v));
+      if(a.length !== b.length) throw new CSSStyleError('No!');
+      var c = [...a, ...b].sort((x, y) => x.index - y.index);
+      c.forEach(c => c.type ? (n++, p.push(c)) : (n == 0 || (n--, p.push(c), n == 0 && (ps.push(p), p = []))));
+      ps.map(v => [v[0], v[v.length - 1]]).flat().forEach(e => (r.push(string.substring(i, e.index), e[0]), i = e.index + e[0].length));
+      return c.length ? r : [string];
+    }
+  };
+
   var OPT = {
     STR: {
       SYMBOL: '\\s*[>~\\+\\.#]\\s*|\\[[^\\]]+\\]|\\s+',// combinator, class, id, attribute
@@ -84,6 +103,9 @@
         n.push(s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
         var w, x = [], y, z = new CSSSelectorParts, _;
+
+        var _not = new NestParser('\\:not\\(', '\\)'); // :not()
+
         while((y = n.shift()) || y == '') {
           (y == '' || SYM_CHAR.COM[y])
             ? (x.push(z), z = new CSSSelectorParts, z.next.type = SYM_CHAR.COM[y])
@@ -220,7 +242,6 @@
 
 
 /*
-
 var s = `
 @charset "utf-8";
 #body > a[href*="\\{"]:first-child:last-child::before {
