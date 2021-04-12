@@ -12,6 +12,7 @@
       SEPARATE: '\\s*,\\s*',
       BRACKET_REV: '[\\{\\}](?!\\\\)',
       AT_RULES: '^@(\\S+?)(?:\\s(.*?)|)$',
+      AT_RULES_INLINE: '^@(\\S+?)(?:\\s([^\\{\\}]*?)|);$',
       KEYFRAMES: '^(from|to|[\\d\\.]+?%)$'
     },
     BASE: class {
