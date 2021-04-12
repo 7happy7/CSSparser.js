@@ -19,6 +19,7 @@
       constructor(str) {this.str = str; this.reg;}
       exec() {return [...this.str.matchAll(this.reg)].map(v => (v.len = v[0].length, v));}// instead of 'while((variable = RegEx.exec(String))) {...}'
       split() {return this.str.split(this.reg);}
+      digest() {return this.str.replace(this.reg, '')}
     },
     REG: {}
   };
