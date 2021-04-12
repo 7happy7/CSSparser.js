@@ -12,7 +12,7 @@
       SEPARATE: '\\s*,\\s*',
       BRACKET_REV: '[\\{\\}](?!\\\\)',
       AT_RULES: '^@(\\S+?)(?:\\s(.*?)|)$',
-      AT_RULES_INLINE: '^@(\\S+?)(?:\\s([^\\{\\}]*?)|);$',
+      AT_RULES_INLINE: '^@(\\S+?)(?:\\s([^\\{\\}]*?)|);',
       KEYFRAMES: '^(from|to|[\\d\\.]+?%)$'
     },
     BASE: class {
@@ -138,7 +138,8 @@
       this.css = css;
     }
     get entry() {
-      var css = REV(this.css.trim());
+      var at = new OPT.REG['AT_RULES_INLINE'](this.css.trim());
+      var css = REV(at.digest());
       var bracket = new OPT.REG['BRACKET_REV']( css ).exec(), _ = bracket.map(v => v[0]), _a = _.filter(v => v == '}'), _b = _.filter(v => v == '{');
       var map = [], a = 0, b = 0, c, d, e, i = 0;
       while((c = bracket.shift())) {
@@ -151,12 +152,16 @@
       if(!res[0].sel || res[res.length - 1].sel || _.length !== (_a.length + _b.length) || _a.length !== _b.length) {
         throw new CSSStyleError('The bracket pattern is not valid.');
       }
-      return res;
+      return {entry: res, at_rules_inline: at.exec()};
     }
     get map() {
-      var com = new StyleComponent(null, '__root__'), cur, base = {}, flg = true, reg;
+      var entry = this.entry, com = new StyleComponent(null, '__root__'), cur, base = {}, flg = true, reg;
       base[-1] = com;
-      this.entry.forEach(e => {
+      entry.at_rules_inline.forEach(a => {
+        var o = new CSSAtRuleSelector(...a);
+        com.append(new StyleComponent(o, o.type));
+      });
+      entry.entry.forEach(e => {
         e.sel
           ? (
             reg = SelectorSwitcher(e.str),
@@ -177,9 +182,10 @@
 })(this);
 
 
-
 /*
+
 var s = `
+@charset "utf-8";
 a[href*="\\{"] {
   animation: anim 1s;
 }
@@ -194,4 +200,5 @@ a[href*="\\{"] {
 `;
 var c = new CSSObject(s);
 console.log(c.entry, c.map);
+
 */
