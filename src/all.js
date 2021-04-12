@@ -154,7 +154,7 @@
       }
       return {entry: res, at_rules_inline: at.exec()};
     }
-    get map() {
+    get CSSOM() {
       var entry = this.entry, com = new StyleComponent(null, '__root__'), cur, base = {}, flg = true, reg;
       base[-1] = com;
       entry.at_rules_inline.forEach(a => {
@@ -199,6 +199,6 @@ a[href*="\\{"] {
 }
 `;
 var c = new CSSObject(s);
-console.log(c.entry, c.map);
+console.log(c.entry, c.CSSOM);
 
 */
