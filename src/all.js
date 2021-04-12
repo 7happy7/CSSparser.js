@@ -13,7 +13,9 @@
       BRACKET_REV: '[\\{\\}](?!\\\\)',
       AT_RULES: '^@(\\S+?)(?:\\s(.*?)|)$',
       AT_RULES_INLINE: '^@(\\S+?)(?:\\s([^\\{\\}]*?)|);',
-      KEYFRAMES_DURATION: '^(from|to|[\\d\\.]+?%)$'
+      KEYFRAMES_DURATION: '^(from|to|[\\d\\.]+?%)$',
+      SEMICOLON: '\\s*;\\s*',
+      PROPERTY: '^(.+?)\\:\\s*(.+?)$'
     },
     BASE: class {
       constructor(str) {this.str = str; this.reg;}
@@ -108,19 +110,33 @@
     }
     return r ? obj[o](selector, r.slice(1)) : new CSSBasicSelector(selector);
   }
+  
+  var CSSProperty = class extends Array {
+    constructor(...args) {
+      super(...args);
+    }
+  }
 
   var REV = s => s.split('').reverse().join('');
   var StyleComponent = class {
     constructor(key, type) {
       this.key = key;
       this.type = type;
-      this.value = [];
+      this.property = new CSSProperty;
       this.child = [];
       this.original = [this];
       this.parent = null;
     }
     set(value) {
-      this.value.push(value);
+      var vs = new OPT.REG['SEMICOLON'](value).split().filter(v => v);
+      vs.forEach(v => {
+        var es = new OPT.REG['PROPERTY'](v).exec();
+        es.forEach(e => {
+          this.property.push(`${e[1]}:${e[2]}`);
+          this.property[e[1]] = e[2];
+        });
+      });
+      this.property.sort();
       return this;
     }
     append(child) {
@@ -182,8 +198,8 @@
 })(this);
 
 
-/*
 
+/*
 var s = `
 @charset "utf-8";
 a[href*="\\{"] {
