@@ -13,7 +13,7 @@
       BRACKET_REV: '[\\{\\}](?!\\\\)',
       AT_RULES: '^@(\\S+?)(?:\\s(.*?)|)$',
       AT_RULES_INLINE: '^@(\\S+?)(?:\\s([^\\{\\}]*?)|);',
-      KEYFRAMES: '^(from|to|[\\d\\.]+?%)$'
+      KEYFRAMES_DURATION: '^(from|to|[\\d\\.]+?%)$'
     },
     BASE: class {
       constructor(str) {this.str = str; this.reg;}
@@ -90,7 +90,7 @@
     constructor(selector, ...duration) {
       super(selector);
       this.type = 'keyframes_duration';
-      this.duration = duration.map(v => new OPT.REG['KEYFRAMES'](v).exec()[0]);
+      this.duration = duration.map(v => new OPT.REG['KEYFRAMES_DURATION'](v).exec()[0]);
       if(this.duration.find(v => !v)) throw new CSSStyleError(`The keyframes duration "${this.duration}" is not valid.`);
     }
   };
@@ -99,7 +99,7 @@
     var sels = new OPT.REG['SEPARATE'](selector.trim()).split();
     var obj = {
       AT_RULES: (s, r) => new CSSAtRuleSelector(s, ...r),
-      KEYFRAMES: (s, r) => new CSSKeyFramesDurationSelector(s, ...r)
+      KEYFRAMES_DURATION: (s, r) => new CSSKeyFramesDurationSelector(s, ...r)
     }
     var opt = Object.keys(obj), o, r;
     while((o = opt.shift())) {
