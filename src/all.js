@@ -20,7 +20,7 @@
       var c = [...a, ...b].sort((x, y) => x.index - y.index);
       c.forEach(c => c.type ? (n++, p.push(c)) : (n == 0 || (n--, p.push(c), n == 0 && (ps.push(p), p = []))));
       ps.map(v => [v[0], v[v.length - 1]]).flat().forEach(e => (r.push(string.substring(i, e.index), e[0]), i = e.index + e[0].length));
-      return c.length ? r : [string];
+      return c.length ? (r.push(string.substring(i)), r) : [string];
     }
   };
 
@@ -93,18 +93,22 @@
       this.type = 'basic';
     }
     get order() {
-      return new OPT.REG['SEPARATE'](this.selector.trim()).split().map(s => {
-        var e = new OPT.REG['SYMBOL'](s).exec(), i = 0;
+      return new OPT.REG['SEPARATE'](this.selector.trim()).split().map(s => {// ooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+        var _not = new NestParser('\\:not\\(', '\\)').parse(s);
+        var _s = _not.filter((v, i) => i % 4 !== 2).join('');
+        var not_content = _not.filter((v, i) => i % 4 == 2);
+
+        var e = new OPT.REG['SYMBOL'](_s).exec(), i = 0;
         var n = e.map(_ => {
-          var r = s.substring(i, _.index).trim();
+          var r = _s.substring(i, _.index).trim();
           i = _.index + _.len;
           return [r, _[0].trim()];
         }).flat();
-        n.push(s.substring(i));
+        n.push(_s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
         var w, x = [], y, z = new CSSSelectorParts, _;
 
-        var _not = new NestParser('\\:not\\(', '\\)'); // :not()
 
         while((y = n.shift()) || y == '') {
           (y == '' || SYM_CHAR.COM[y])
@@ -113,10 +117,12 @@
               ? (z[_] = y, _ = void(0))
               : ((w = new OPT.REG['ATTRIBUTE'](y).exec()).length
                 ? z.attribute.push(w[0].slice(1, 4))
-                : ((w = new OPT.REG['PSEUDO'](y).exec()).length
-                  ? w.forEach(_w => z.pseudo[SYM_CHAR.PSE[_w[1]]].push(_w[2]))
+                : ((w = new OPT.REG['PSEUDO'](y)).exec().length
+                  ? (w.exec().forEach(_w => z.pseudo[SYM_CHAR.PSE[_w[1]]].push(
+                      (_w[1] == ':' && _w[2] == 'not()') ? (`not(${not_content.shift()})`) : _w[2] 
+                    )), (w = w.digest()) && (z.tag = w))
                   : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
-              )))
+              )));
         }
         x.push(z);
         return x.reverse().filter(v => JSON.stringify(v) !== JSON.stringify(new CSSSelectorParts));
@@ -241,10 +247,10 @@
 })(this);
 
 
-/*
+
 var s = `
 @charset "utf-8";
-#body > a[href*="\\{"]:first-child:last-child::before {
+#body > a[href*="\\{"]:first-child:last-child a:not(div:not(.x) > a:not([href])):not(.x)::before {
   content: "";
   animation: anim 1s;
 }
@@ -259,6 +265,5 @@ var s = `
 `;
 var obj = new CSSObject(s);
 var c = obj.CSSOM;
-var _ = c.child[1].key.order; // "#body > a[href*="\\{"]:first-child:last-child::before"
+var _ = c.child[1].key.order; // "#body > a[href*="\\{"]:first-child:last-child a:not(div:not(.x) > a:not([href])):not(.x)::before"
 console.log(obj.entry, c, _);
-*/
