@@ -95,9 +95,9 @@
     get order() {
       return new OPT.REG['SEPARATE'](this.selector.trim()).split().map(s => {// ooooooooooooooooooooooooooooooooooooooooooooooooooo
 
-        var _not = new NestParser('\\:not\\(', '\\)').parse(s);
-        var _s = _not.filter((v, i) => i % 4 !== 2).join('');
-        var not_content = _not.filter((v, i) => i % 4 == 2);
+        var _pc = new NestParser('\\:[a-zA-Z\\-]+?\\(', '\\)').parse(s);
+        var _s = _pc.filter((v, i) => i % 4 !== 2).join('');
+        var pc_content = _pc.filter((v, i) => i % 4 == 2);
 
         var e = new OPT.REG['SYMBOL'](_s).exec(), i = 0;
         var n = e.map(_ => {
@@ -107,22 +107,22 @@
         }).flat();
         n.push(_s.substring(i));
         n = n.filter((v, i, a) => v !== '' || !(SYM_CHAR.COM[a[i + 1]]));
-        var w, x = [], y, z = new CSSSelectorParts, _;
-
+        var w, x = [], y, z = new CSSSelectorParts, r = /^([a-zA-Z\-]+?)\(\)/, _;
 
         while((y = n.shift()) || y == '') {
+          (w = new OPT.REG['PSEUDO'](y)).exec().length
+            && (w.exec().forEach(_w => z.pseudo[SYM_CHAR.PSE[_w[1]]].push(
+              (_w[1] == ':' && (_w[2].match(r))) ? (`${_w[2].match(r)[1]}(${pc_content.shift()})`) : _w[2]
+            )), (y = w.digest() || null));
+
           (y == '' || SYM_CHAR.COM[y])
             ? (x.push(z), z = new CSSSelectorParts, z.next.type = SYM_CHAR.COM[y])
             : (_
-              ? (z[_] = y, _ = void(0))
-              : ((w = new OPT.REG['ATTRIBUTE'](y).exec()).length
+              ? y && (z[_] = y, _ = void(0))
+              : y && ((w = new OPT.REG['ATTRIBUTE'](y).exec()).length
                 ? z.attribute.push(w[0].slice(1, 4))
-                : ((w = new OPT.REG['PSEUDO'](y)).exec().length
-                  ? (w.exec().forEach(_w => z.pseudo[SYM_CHAR.PSE[_w[1]]].push(
-                      (_w[1] == ':' && _w[2] == 'not()') ? (`not(${not_content.shift()})`) : _w[2] 
-                    )), (w = w.digest()) && (z.tag = w))
-                  : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
-              )));
+                : (_ = SYM_CHAR.ATR[y], _ || (z.tag = y))
+              ));
         }
         x.push(z);
         return x.reverse().filter(v => JSON.stringify(v) !== JSON.stringify(new CSSSelectorParts));
@@ -248,9 +248,11 @@
 
 
 
+console.time('timer');
+
 var s = `
 @charset "utf-8";
-#body > a[href*="\\{"]:first-child:last-child a:not(div:not(.x) > a:not([href])):not(.x)::before {
+#body > li.list:nth-child(2) a[href*="\\{"]:first-child:last-child a:not(div:not(.x) > a:not([href])):not(.x)::before {
   content: "";
   animation: anim 1s;
 }
@@ -267,3 +269,5 @@ var obj = new CSSObject(s);
 var c = obj.CSSOM;
 var _ = c.child[1].key.order; // "#body > a[href*="\\{"]:first-child:last-child a:not(div:not(.x) > a:not([href])):not(.x)::before"
 console.log(obj.entry, c, _);
+
+console.timeEnd('timer');
