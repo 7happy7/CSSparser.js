@@ -1,3 +1,5 @@
+import Keywords as K from 'Keywords.js';
+
 var section = max => (n => n
   ? !isNaN(n) && 0 < n && n <= max
   : n === 0);
