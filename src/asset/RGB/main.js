@@ -57,7 +57,7 @@ var hsla = (H, S, L, A) => {
  * @this {RGBAConverter}
  * @param {RGBAObject} self
  */
-var RGBAConverter = class {
+class RGBAConverter {
   constructor(self) {
     this.self = self;
   }
@@ -94,7 +94,7 @@ var RGBAConverter = class {
  * @param {number | undefined} B Blue
  * @param {number} A Alpha (default: 1)
  */
-var RGBAObject = class {
+class RGBAObject {
   constructor(R, G, B, A=1) {
     [this.R, this.G, this.B, this.A] = [R, G, B, A];
   }
