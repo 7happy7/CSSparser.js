@@ -1,4 +1,4 @@
-import Keywords as K from 'Keywords.js';
+import Keywords as K from 'keywords.js';
 
 var key = K.CSS3_KEYWORDS;
 
