@@ -1,6 +1,4 @@
-import Keywords as K from 'keywords.js';
-
-var key = K.CSS3_KEYWORDS;
+import CSS3_COLOR_KEYWORDS as C_KEY from 'keywords.js';
 
 var section = max => (n => n
   ? !isNaN(n) && 0 < n && n <= max
@@ -67,7 +65,7 @@ var RGBAConverter = class {
     return this.self;
   }
   KEYWORD(CSS3_COLOR_KEYWORD) {
-    var k = key[CSS3_COLOR_KEYWORD];
+    var k = C_KEY[CSS3_COLOR_KEYWORD];
     if(!k) throw new Error(`invalid keyword: "${CSS3_COLOR_KEYWORD}"`);
     [this.self.R, this.self.G, this.self.B] = k;
     return this.self;
