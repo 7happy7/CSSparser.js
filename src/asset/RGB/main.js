@@ -103,7 +103,7 @@ class RGBAObject {
     [this.R, this.G, this.B, this.A] = [R, G, B, A];
   }
   /**
-   * @type {RGBAConverter}
+   * @return {RGBAConverter}
    */
   get from() {
     return new RGBAConverter(this);
