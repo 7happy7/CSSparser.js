@@ -52,7 +52,7 @@ var hsla = (H, S, L, A) => {
 
 
 /**
- * @classdesc Inner class: RGBAObject.from
+ * Inner class: RGBAObject.from
  * @constructor
  * @param {RGBAObject} self
  */
@@ -86,7 +86,7 @@ class RGBAConverter {
 }
 
 /**
- * @classdesc The class of formatting colors into RGB(A)
+ * The class of formatting colors into RGB(A)
  * @constructor
  * @param {number | undefined} R Red
  * @param {number | undefined} G Green
