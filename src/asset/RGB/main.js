@@ -50,20 +50,34 @@ var hsla = (H, S, L, A) => {
   return r;
 };
 
-// inner class: RGBAObject.from
+
+/**
+ * @classdesc Inner class: RGBAObject.from
+ * @constructor
+ * @this {RGBAConverter}
+ * @param {RGBAObject} self
+ */
 var RGBAConverter = class {
   constructor(self) {
     this.self = self;
   }
+  /** @param {string} Hex #b01, #b01a, #bb0011, #bb0011aa*/
   HEX(Hex) {
     var h = hex(Hex);
     [this.self.R, this.self.G, this.self.B, this.self.A] = h.ary;
     return this.self;
   }
+  /**
+   * @param {number} H Hue
+   * @param {number} S Saturation
+   * @param {number} L Lightness
+   * @param {number} A Alpha (default: 1)
+   */
   HSL(H, S, L, A=1) {
     [this.self.R, this.self.G, this.self.B, this.self.A] = hsla(H, S, L, A);
     return this.self;
   }
+  /** @param {string} CSS3_COLOR_KEYWORD */
   KEYWORD(CSS3_COLOR_KEYWORD) {
     var k = CSS3_COLOR_KEYWORDS[CSS3_COLOR_KEYWORD];
     if(!k) throw new Error(`invalid keyword: "${CSS3_COLOR_KEYWORD}"`);
@@ -72,6 +86,14 @@ var RGBAConverter = class {
   }
 }
 
+/**
+ * @constructor
+ * @this {RGBAObject}
+ * @param {number | undefined} R Red
+ * @param {number | undefined} G Green
+ * @param {number | undefined} B Blue
+ * @param {number} A Alpha (default: 1)
+ */
 var RGBAObject = class {
   constructor(R, G, B, A=1) {
     [this.R, this.G, this.B, this.A] = [R, G, B, A];
