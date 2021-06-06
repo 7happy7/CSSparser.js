@@ -50,7 +50,7 @@ var hsla = (H, S, L, A) => {
   return r;
 };
 
-// inner class: Convert.from
+// inner class: RGBAObject.from
 var RGBAConverter = class {
   constructor(self) {
     this.self = self;
