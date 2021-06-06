@@ -91,12 +91,12 @@ var rgb2 = (new RGBAObject).from.HSL(20.104, 0.749, 0.5);
 
 var rgb3 = new RGBAObject(100, 30, 180, 0.5);
 
-console.log(rgb1, rgb2);
+console.log(rgb1, rgb2, rgb3);
 // RGBAObject {R: 187, G: 0, B: 17, A: 0.6666666666666666}
 // RGBAObject {R: 222.9975, G: 95.998558, B: 32.0025, A: 1}
 // RGBAObject {R: 100, G: 30, B: 180, A: 0.5}
 
-console.log(rgb1+'', rgb2+'');
+console.log(rgb1+'', rgb2+'', rgb3+'');
 // "rgba(187, 0, 17, 0.6666666666666666)"
 // "rgba(222.9975, 95.998558, 32.0025, 1)"
 // "rgba(100, 30, 180, 0.5)"
