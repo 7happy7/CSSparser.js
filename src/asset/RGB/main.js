@@ -51,16 +51,18 @@ var hsla = (H, S, L, A) => {
 };
 
 
-/**
- * Inner class: RGBAObject.from
- * @constructor
- * @param {RGBAObject} self
- */
+
 class RGBAConverter {
+  /**
+   * @param {RGBAObject} self
+   */
   constructor(self) {
     this.self = self;
   }
-  /** @param {string} Hex #b01, #b01a, #bb0011, #bb0011aa*/
+  /** 
+   * @param {string} Hex #b01, #b01a, #bb0011, #bb0011aa
+   * @return {RGBAObject}
+   */
   HEX(Hex) {
     var h = hex(Hex);
     [this.self.R, this.self.G, this.self.B, this.self.A] = h.ary;
@@ -71,12 +73,16 @@ class RGBAConverter {
    * @param {number} S Saturation
    * @param {number} L Lightness
    * @param {number} A Alpha (default: 1)
+   * @return {RGBAObject}
    */
   HSL(H, S, L, A=1) {
     [this.self.R, this.self.G, this.self.B, this.self.A] = hsla(H, S, L, A);
     return this.self;
   }
-  /** @param {string} CSS3_COLOR_KEYWORD */
+  /** 
+   * @param {string} CSS3_COLOR_KEYWORD aliceblue, antiquewhite...
+   * @return {RGBAObject}
+   */
   KEYWORD(CSS3_COLOR_KEYWORD) {
     var k = CSS3_COLOR_KEYWORDS[CSS3_COLOR_KEYWORD];
     if(!k) throw new Error(`invalid keyword: "${CSS3_COLOR_KEYWORD}"`);
@@ -85,21 +91,26 @@ class RGBAConverter {
   }
 }
 
-/**
- * The class of formatting colors into RGB(A)
- * @constructor
- * @param {number | undefined} R Red
- * @param {number | undefined} G Green
- * @param {number | undefined} B Blue
- * @param {number} A Alpha (default: 1)
- */
+
 class RGBAObject {
+  /**
+   * @param {number | undefined} R Red
+   * @param {number | undefined} G Green
+   * @param {number | undefined} B Blue
+   * @param {number} A Alpha (default: 1)
+   */
   constructor(R, G, B, A=1) {
     [this.R, this.G, this.B, this.A] = [R, G, B, A];
   }
+  /**
+   * @type {RGBAConverter}
+   */
   get from() {
     return new RGBAConverter(this);
   }
+  /** 
+   * @return {string}
+   */
   toString() {
     return `rgba(${this.R}, ${this.G}, ${this.B}, ${this.A})`;
   }
