@@ -84,11 +84,11 @@ var RGBAObject = class {
   }
 };
 
-// var rgb1 = new RGBAObject();
-// rgb1.from.HEX('#b01a');
+// var rgb1 = new RGBAObject().from.HEX('#b01a');
 
-// var rgb2 = new RGBAObject();
-// rgb2.from.HSL(20.104, 0.749, 0.5);
+// var rgb2 = (new RGBAObject).from.HSL(20.104, 0.749, 0.5);
+
+// var rgb3 = new RGBAObject(100, 30, 180, 0.5);
 
 // console.log(rgb1, rgb2);
 // RGBAObject {R: 187, G: 0, B: 17, A: 0.6666666666666666}, RGBAObject {R: 222.9975, G: 95.998558, B: 32.0025, A: 1}
