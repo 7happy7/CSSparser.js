@@ -69,7 +69,7 @@ var RGBAConverter = class {
   KEYWORD(CSS3_COLOR_KEYWORD) {
     var k = key[CSS3_COLOR_KEYWORD];
     if(!k) throw new Error(`invalid keyword: "${CSS3_COLOR_KEYWORD}"`);
-    [this.self.R, this.self.G, this.self.B] = [k.r, k.g, k.b];
+    [this.self.R, this.self.G, this.self.B] = [k.R, k.G, k.B];
     return this.self;
 }
 
