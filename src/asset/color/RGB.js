@@ -66,6 +66,11 @@ var RGBAConverter = class {
     [this.self.R, this.self.G, this.self.B, this.self.A] = hsla(H, S, L, A);
     return this.self;
   }
+  KEYWORD(CSS3_COLOR_KEYWORD) {
+    var k = key[CSS3_COLOR_KEYWORD];
+    if(!k) throw new Error(`invalid keyword: "${CSS3_COLOR_KEYWORD}"`);
+    [this.self.R, this.self.G, this.self.B] = [k.r, k.g, k.b];
+    return this.self;
 }
 
 var RGBAObject = class {
