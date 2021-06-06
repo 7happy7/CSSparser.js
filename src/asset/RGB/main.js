@@ -86,6 +86,7 @@ class RGBAConverter {
 }
 
 /**
+ * @classdesc The class of formatting colors into RGB(A)
  * @constructor
  * @param {number | undefined} R Red
  * @param {number | undefined} G Green
